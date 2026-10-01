@@ -1,6 +1,6 @@
 # Lumière Kitchen
 
-An Arizonix demonstration project for a fictional restaurant in Manchester, UK. **Step 1.1 only:** runnable application foundation, temporary welcome page and engineering handoff. Reservations and other product features are not implemented.
+An Arizonix demonstration project for a fictional restaurant in Manchester, UK. Step 1.1 supplies the runnable foundation and temporary welcome page; Step 1.2 defines operating contracts and future acceptance criteria. Reservations and other product features are not implemented.
 
 ## Local setup
 
@@ -39,7 +39,15 @@ For any command in the table on Windows, replace `pnpm` with `npm.cmd exec --yes
 - `docs/decisions/0001-application-foundation.md`: foundation decision and official framework references.
 - `docs/progress.md`: verification evidence, limitations and next-step handoff.
 
-The directory was empty and was not a Git repository. The single pnpm lockfile is supplied for version control; no Git commit or remote action has been performed. Future module locations are documented, not scaffolded as unused folders.
+## Operating contracts (Step 1.2)
+
+- [Restaurant policies](docs/domain/restaurant-policies.md): authoritative configurable demonstration defaults, service dates, tables and setting changes.
+- [Reservation lifecycle](docs/domain/reservation-lifecycle.md): states, transitions, finite holds, atomic edits and cleanup.
+- [Permission matrix](docs/security/permission-matrix.md): actor boundaries and secure reservation-scoped access.
+- [Acceptance criteria](docs/quality/acceptance-criteria.md): interaction specifications and 70 unexecuted Given/When/Then scenarios for later phases.
+- [ADR 0002](docs/decisions/0002-reservation-operating-contract.md): decisions, tradeoffs and later-phase gates.
+
+The directory was empty during Step 1.1. At Step 1.2 inspection it has an existing Git baseline and a clean working tree. One pnpm lockfile remains authoritative; this step makes no commits or remote changes. Future module locations are documented, not scaffolded as unused folders.
 
 ## Environment and verification
 
@@ -47,4 +55,4 @@ Integration-specific schema validation will be added alongside each provider, at
 
 Run lint, typecheck and build, then start the production server. Check `/` returns the demo page and `/missing-page` returns the custom 404; follow Back to home. Manually inspect 360px, 768px and 1440px widths for overflow, use 200% zoom, and Tab/Enter through the skip and recovery links. Detailed checks and error-boundary limitations are in engineering standards and progress.
 
-Next authorised work requires the specific **1.2** prompt. Full test infrastructure and CI belong to **1.3**.
+Next work requires the specific **1.3** prompt for quality checks, CI and test infrastructure. Step 1.2's acceptance scenarios are specifications, not passing tests or implemented product features.

@@ -10,4 +10,4 @@ Payments, ordering, delivery, POS integration, automatic Instagram/Facebook inge
 
 Step 1.1 implements only application setup, a temporary welcome page, recovery states and engineering documentation. It does not provide reservations or any other operational feature. Later phases require their specific step prompt.
 
-Step 1.2 must settle service schedules, dining durations, turnaround, table combinations, pending/offer capacity policy, cancellation/edit cutoffs, lifecycle transitions, permission matrix and measurable acceptance criteria before implementation.
+Step 1.2 defines the demonstration operating contract in [restaurant policies](domain/restaurant-policies.md), [reservation lifecycle](domain/reservation-lifecycle.md), [permission matrix](security/permission-matrix.md) and [acceptance criteria](quality/acceptance-criteria.md). Those documents own the rules and stable requirement IDs; their examples are synthetic and unexecuted. See [ADR 0002](decisions/0002-reservation-operating-contract.md) for decisions and explicit later-phase gates. No runtime rules, migrations, authentication, booking interface or test infrastructure are added by Step 1.2.

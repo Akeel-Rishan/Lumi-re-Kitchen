@@ -1,10 +1,10 @@
 # Development roadmap
 
-Only Step 1.1 is authorised. Later steps must not be implemented without their specific step prompt. Each step should end with recorded evidence against its acceptance criteria.
+Steps 1.1 and 1.2 are authorised; 1.2 defines contracts only. Later steps must not be implemented without their specific step prompt. Each step should end with recorded evidence against its acceptance criteria.
 
 ## 1. Product and engineering foundation
 - **1.1 — Complete:** Repository inspection, application foundation, architecture documentation, and development handoff. Installation, lint, types, build and local HTTP smoke checks passed; visual limitations are recorded in progress.md.
-- **1.2 — Pending:** Restaurant policies, reservation lifecycle, permissions, and acceptance criteria. Review a transition matrix, capacity/expiry policies and role matrix with concrete examples.
+- **1.2 — Complete:** Restaurant policies, reservation lifecycle, permissions, and acceptance criteria. [Operating contracts and 70 future scenarios](quality/acceptance-criteria.md) reviewed for consistency; existing lint/type/build checks passed. Scenarios remain unexecuted specifications; see [handoff](progress.md).
 - **1.3 — Pending:** Automated quality checks, CI, and test infrastructure. Demonstrate clean-install CI and a meaningful initial test at each required layer.
 
 ## 2. Premium design system

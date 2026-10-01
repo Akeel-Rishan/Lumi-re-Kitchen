@@ -1,6 +1,51 @@
 # Development handoff
 
-Current step: **1.1 — Complete**, with manual browser checks outstanding as explicitly recorded below. Date: 2026-10-01.
+Current step: **1.2 — Complete**. Documentation and consistency review completed on 2026-10-01. Step 1.1 evidence is preserved below as historical context.
+
+## Step 1.2 handoff
+
+Scope: documentation only; operating policies, lifecycle, permissions and traceable future acceptance criteria. No application source, presentation configuration, dependency, migration, authentication, UI or test-framework change is authorised or made.
+
+Inspection: all Step 1.1 files and scripts present; existing Git baseline `7419937` and clean working tree. No applicable AGENTS.md found in repository or ancestor directories. Initial `git status --short` encountered sandbox ownership protection; `git -c safe.directory='C:/Users/PC/Desktop/Lumière Kitchen' status --short` succeeded without a persistent/global configuration change. Prior work is preserved.
+
+Created: [restaurant policies](domain/restaurant-policies.md), [lifecycle](domain/reservation-lifecycle.md), [permissions](security/permission-matrix.md), [acceptance criteria](quality/acceptance-criteria.md), [ADR 0002](decisions/0002-reservation-operating-contract.md). Updated README, product scope, architecture, roadmap and this progress record.
+
+Adopted the requested configurable demonstration defaults; [POL-01–11](domain/restaurant-policies.md#schedule-and-booking-defaults) are their single authority. Specific decisions include complete service fit including cleanup, explicit DST/overnight semantics, snapshotted agreements, finite pending holds with no edit-based deadline extension, atomic edit rollback, separate completed-cleanup capacity, action-specific staff waivers and reservation-scoped credentials. No actual inventory or real contact details were invented.
+
+### Consistency review
+
+Reviewed all nine reservation states for meaning, capacity, actors, entry evidence, next states, customer wording and notification intent. The 12 ordinary creation/transition rows each specify actors and preconditions; acknowledged confirmed-to-pending party edits are separately defined. Terminal records cannot be reopened. Completed cleanup, past-deadline pending rows and actual occupancy incidents are explicitly distinguished from status alone.
+
+Checked equality boundaries for notice, horizon, customer cutoff, hold expiry and no-show grace. Latest lunch/dinner times include both dining and buffer. Verified calendar/DST examples with the installed Node Intl timezone data and arithmetic. Pending edits cannot extend the hold deadline; approval/expiry serialize and re-evaluate time under locks. Edit failure preserves a live original booking; independent natural expiry is not prevented by rollback.
+
+Reviewed all role boundaries against lifecycle actors. Staff cannot perform Manager future edits/approvals/reassignment or Owner administration. Completion requiring an extension/after-closing incident resolution escalates to Manager/Owner and remains conflict-checked; factual violation recording does not authorise a bookable extension. All roles retain the double-booking invariant. Disabled identities and customer scope are server/database obligations, not UI controls.
+
+Declined/expired remain distinct from cancellation metrics; waitlist enrollment/offer holds and communication delivery remain separate from reservation state. Provider failure cannot reverse a committed booking. Token lifetime, rotation/revocation, scoped sessions, inert GET, non-enumeration and contact-transfer restrictions are explicit. Pending/result copy cannot imply confirmation.
+
+All 70 scenarios include a stable ID, requirement reference, Given/When/Then, verification layer and target phase. All remain **unexecuted future specifications**, not passing product tests. Definitions use 105 stable requirement IDs across policies, lifecycle, security and UX. Relative Markdown links/anchors resolve; existing source/config references exist, while module paths in architecture remain explicitly planned and intentionally absent. Documentation describes intended behaviour, not implemented engine/security/UI.
+
+### Step 1.2 verification commands and outcomes
+
+| Exact command | Outcome |
+| --- | --- |
+| `git -c safe.directory='C:/Users/PC/Desktop/Lumière Kitchen' status --short` | Clean before edits. Final changes are confined to README and requested documentation; no user work discarded. Command-local ownership exception only. |
+| `npm.cmd run lint` | Passed, exit 0, zero warnings. |
+| `$env:NEXT_TELEMETRY_DISABLED = '1'; npm.cmd run typecheck` | Passed, exit 0; route type generation and strict TypeScript checking. |
+| `$env:NEXT_TELEMETRY_DISABLED = '1'; npm.cmd run build` | Passed, exit 0; Next.js 16.3.8/Turbopack production build, static `/` and `/_not-found`. |
+| `node "$env:TEMP\lumiere-step12-review.cjs"` | One-off local documentation review passed: Markdown file/link/anchor checks, unique definition IDs, 70 structured scenarios with valid references, nine states, 12 transitions, 27 permission rows; service arithmetic, +60-day horizon, weekday and DST fixtures checked. Temporary review script is outside the repository and is not test scaffolding. |
+| `git -c safe.directory='C:/Users/PC/Desktop/Lumière Kitchen' diff --check` | Passed. Git only noted the existing LF-to-CRLF checkout convention; no whitespace errors. |
+
+The initial one-off review parser expected requirement definitions at line starts and missed the inline LIFE-08 definition. Moved that definition to its own paragraph for readability/discoverability and reran successfully. This was a documentation-review issue, not a product-test failure. No dependency installation or version/config changes were needed. The pre-existing ESLint support caveat remains in ADR 0001.
+
+Not performed: future domain/security/concurrency/UI scenarios, new tests/CI, browser or runtime smoke checks. There is no application/UI change in this step; existing build/lint/type checks are the required regression checks. Step 1.1's browser limitations remain historical and are not presented as resolved.
+
+No remaining Step 1.2 blocker or material unresolved operating ambiguity. Explicit later-phase gates: actual table inventory, finite offer lifetime/queue rules (Phase 11), production retention periods, verified contact-transfer workflow and provider-specific secure delivery. None is silently treated as implemented or granted a permissive fallback. See ADR 0002.
+
+Next step: **1.3** only with its specific prompt. All later phases remain pending. No reservation engine, migrations, authentication, dashboard, booking UI or test framework was implemented.
+
+## Step 1.1 historical handoff
+
+Step 1.1 was completed on 2026-10-01 with the manual browser limitations recorded below. Statements about its originally empty/non-Git directory describe that inspection, not the current repository.
 
 Implemented application foundation, central public restaurant configuration, temporary landing page, not-found and application-error recovery, scope, architecture, roadmap and engineering standards.
 
@@ -79,6 +124,6 @@ Calculated CSS colour contrast using sRGB relative luminance: primary text 12.45
 
 No remaining installation or build blocker. Future tooling maintenance should revisit ESLint 10 once all configured plugins support it; no peer or lint rules were suppressed.
 
-Open policy questions for 1.2: schedules, durations, turnaround, table combinations, pending/offer hold rules, expiry, cancellation/edit cutoffs, staff roles and customer verification flow. No external services have been configured.
+At the end of Step 1.1, policies, lifecycle and permissions were open for Step 1.2. These are now addressed in the linked Step 1.2 contracts; Phase 11's offer configuration/queue mechanics and other explicit implementation gates remain deferred. No external services have been configured.
 
-Next step: **1.2**. No later product features have been implemented.
+Historical next step was 1.2. Current handoff appears above. No later product features have been implemented.

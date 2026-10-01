@@ -1,0 +1,136 @@
+# Acceptance criteria and interaction contracts
+
+Status: **specifications only — none of these scenarios has been executed or marked passing**. Phase numbers refer to the unchanged [roadmap](../development-roadmap.md). Step 1.3 establishes test infrastructure; the target phase in each scenario is when the capability and its test are implemented. Documentation consistency checks are not product-test results.
+
+Requirement authorities: [POL/TIME/SET/CAP/DATA/OPS](../domain/restaurant-policies.md), [LIFE/TR/SEP](../domain/reservation-lifecycle.md), [SEC/PERM/SELF](../security/permission-matrix.md). IDs remain stable if wording is refined; add new IDs rather than renumbering existing ones.
+
+## Interaction specifications (no screens implemented)
+
+| ID | Intended behaviour |
+| --- | --- |
+| UX-01 | Customer journey: (1) party size/date, (2) available times, (3) name/email/phone and optional requests, (4) review, (5) committed confirmed result or clearly labelled approval-pending result. Explain agreed dining duration, turnaround implication, party approval, deadline and any already-reached self-service cutoff before submission. |
+| UX-02 | Availability is provisional. On conflict preserve entered details/requests and selected intent; refresh options and suggest valid nearby times/dates when available. Distinguish a successful empty availability response from a service/network error. Never suggest an option that violates service fit. |
+| UX-03 | Prevent accidental duplicate submission with visible submitting state, while the server uses an idempotency key. A timeout is “outcome being checked,” not proof of failure; recover the same command result before permitting a new attempt. Show success only after commit. Pending wording must never imply confirmation. |
+| UX-04 | Display dates/times in restaurant-local context with zone/offset where needed; do not reinterpret using the device zone. Display the service-opening date separately when an overnight calendar date differs. Review and final result show guest count, start, agreed duration, state, deadline where relevant and next available action. |
+| UX-05 | Actionable inline validation plus a focusable error summary linked to affected fields; preserve input. Announce asynchronous result/conflict changes with appropriate live status semantics without stealing focus unnecessarily. Text/icon labels accompany colour; status is never conveyed by colour alone. |
+| UX-06 | Staff views distinguish all lifecycle states, pending deadlines, cleanup, occupancy incidents and communication failures. Prioritise today's service and essential actions, show stale-version conflicts with refresh/review, and never silently replay an obsolete action. |
+| UX-07 | Staff cancellation/decline requires confirmation and reason; exceptional edits/reassignments require impact preview, reason and confirmation where they alter the guest agreement. Destructive customer cancellation needs explicit confirmation. After-cutoff assistance is shown as an authorised staff action, not a hidden bypass. |
+| UX-08 | Customer workflow at 360px has no horizontal scrolling; use single-column mobile forms and touch targets approximately 44px or larger where applicable. Verify also 768px and 1440px and 200% zoom. Essential actions remain available on mobile. |
+| UX-09 | Every critical customer and staff workflow is keyboard-completable with visible focus and predictable focus return. Admin tables offer a labelled narrow-screen list/card alternative or contained, keyboard-accessible horizontal scroll with clear row/column context, never whole-page overflow hiding essential actions. Respect reduced motion if motion is introduced. |
+| UX-10 | Implement loading, empty, recoverable error, committed success, permission-denied and stale/capacity-conflict states where applicable. After-cutoff customer view explains available staff assistance using verified contact details; if unconfigured, honestly state that demo contact details are unavailable, without a dead link or fabricated number. |
+
+## Synthetic fixtures and time conventions
+
+These are test inputs, **not restaurant inventory or seed data**. Unless overridden, each scenario is independent, uses Tuesday 6 October 2026, Europe/London (UTC+01:00), current time 16:00 and a dinner start at 18:00. All required contacts are valid synthetic test values; no messages are sent. No existing allocation or closure exists unless stated. Only the tables named as eligible in a scenario are available; unspecified fixture tables are unavailable to that scenario. This makes “last table” and conflict outcomes deterministic.
+
+| Fixture | Area | Effective guest capacity |
+| --- | --- | --- |
+| A, B | Main | 2 each |
+| C | Main | 4 |
+| D | Main | 6 |
+| E | Main | 8 |
+| F | Main | 12 |
+| T | Terrace | 2 |
+| AB | Main | Explicit allowed combination A+B, effective capacity 4 |
+| BC | Main | Explicit allowed combination B+C, effective capacity 6 |
+
+All are active unless stated; A+T is never a permitted combination. Availability acceptance must distinguish a capacity-valid interval from an eligible start under the grid/service rules. For overlap-only tests, use a clearly stated stored synthetic range or a permitted adjusted operational interval; do not imply every minute is an online slot. “Same instant” boundary tests use a controlled authoritative clock; production uses the transaction decision time in LIFE-01.
+
+## Schedule, time and input scenarios
+
+| ID | Requirement reference | Given (preconditions) | When (action) | Then (expected result) | Verification layer | Target phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-001 | POL-06/07; TR-01; CAP-06 | Two guests, A free, default fixture time | Submit a valid 18:00 booking | Commit confirmed, dining end 19:30, occupancy [18:00,19:45), one idempotency result and confirmation intent | database integration | 4 |
+| AC-002 | POL-06/07; TR-02; LIFE-03 | Eight guests, E free, create at 16:00 | Request 18:00 with approval acknowledgement | Commit pending, occupancy [18:00,20:45), deadline 18:00; receipt says not confirmed and shows deadline | API integration | 4 |
+| AC-003 | POL-06 | Thirteen guests and F free | Submit ordinary public booking | Reject online party limit; no booking/hold/outbox success; provide truthful staff-contact guidance | API integration | 8 |
+| AC-004 | POL-02; SET-01 | Monday 5 October 2026, no date override | Request availability for that date | Successful empty response identifying closure, not a provider error or available slot | unit | 4 |
+| AC-005 | SET-01; POL-03 | Tuesday override contains only 18:00–21:00 | Generate two-person starts | Only 18:00,18:30,19:00 are eligible; neither recurring lunch nor 17:30 dinner is appended | unit | 4 |
+| AC-006 | POL-04 | Two guests, A free, 18:00 start, clock 17:00:00 then 17:00:01 in isolated cases | Submit each request | Equality case may confirm; second is rejected for notice with no allocation | API integration | 4 |
+| AC-007 | POL-05; TIME-01 | Local today 1 October 2026; explicit dinner override on Monday 30 November; eligible A | Query 30 November (+60 days) and 1 December (+61) | Include eligible +60 starts; exclude +61, independent of elapsed DST hours | unit | 4 |
+| AC-008 | POL-02/03/07/08 | Tuesday lunch; A,C,E respectively free | Evaluate two/four/eight guests at 13:00/12:30/12:00 and each next grid start | First three occupy until 14:45 and fit; next starts end 15:15 and fail | unit | 4 |
+| AC-009 | POL-02/03/07/08 | Tuesday dinner; A,C,E respectively free | Evaluate two/four/eight guests at 20:30/20:00/19:30 and each next grid start | First three end occupancy 22:15; next starts end 22:45 and fail; 22:30 is never a final arrival option | unit | 4 |
+| AC-010 | TIME-04; POL-08 | Future override Tuesday 20:00 to Wednesday 02:00, closing offset 1 | Evaluate Wednesday 00:00 and 00:30 for two guests | 00:00 belongs to Tuesday service and ends 01:45; 00:30 ends 02:15 and fails; do not duplicate under Wednesday | unit | 4 |
+| AC-011 | TIME-03 | Explicit overnight override 28 March 2026 22:00 to 29 March 04:00 | Resolve local 29 March 01:30 Europe/London | Reject nonexistent time; no automatic shift to 02:30 and no allocation | unit | 4 |
+| AC-012 | TIME-02/03 | Override 24 October 2026 22:00 to 25 October 04:00 | Supply bare 25 October 01:30, then explicit 01:30+01:00 and 01:30+00:00 in isolated cases | Bare input rejected; explicit instants distinguish 00:30Z and 01:30Z; two-person occupancy ends 02:15Z and 03:15Z respectively, both before closing | unit | 4 |
+| AC-013 | SET-01 | Tuesday dinner override exists; closure [19:00,20:00) on E | Request eight guests at 18:00 | Reject overlapping occupancy despite override; closure takes precedence | unit | 4 |
+| AC-014 | SET-02/03 | Existing two-person 18:00 booking on A with agreed occupancy to 19:45 | Manager previews default duration change and table deactivation | Duration snapshot stays unchanged; deactivation activation is blocked with affected booking identified until explicit resolution | API integration | 6 |
+| AC-015 | DATA-01/02; UX-05 | Customer details form has missing phone and a 501-code-point request | Submit then correct fields | Show linked inline errors/summary, preserve entered details; accept 500 code points if otherwise valid; no booking on invalid submission | end-to-end | 8 |
+| AC-016 | DATA-02; SEC-07 | Valid booking request includes literal HTML/script-like special-request text under limit | Display in authorised customer/staff views and assistant-adjacent processing | Render as text, execute no markup, treat as neither trusted instruction nor guaranteed seating requirement | end-to-end | 8 |
+
+## Capacity and concurrency scenarios
+
+| ID | Requirement reference | Given | When | Then | Verification layer | Target phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-017 | CAP-02/05 | Four guests; only A and T free, each seats two, no permitted combination | Request 18:00 | No allocation despite four aggregate empty seats | unit | 4 |
+| AC-018 | CAP-02/03/06 | Four guests; only allowed AB available | Create 18:00 booking | One confirmed booking atomically occupies both A and B until 20:15 | database integration | 4 |
+| AC-019 | CAP-03/06 | AB candidate; B occupied [19:00,20:45), A free | Request four guests at 18:00 | Reject combination; no partial hold/allocation on A | database integration | 4 |
+| AC-020 | CAP-03; TIME-02 | Four-person booking on C at 18:00 with dining end 20:00 and cleanup to 20:15 | Request C at 20:00 for two guests | Reject despite dining ending at requested start, because cleanup overlaps | database integration | 4 |
+| AC-021 | TIME-02; CAP-03 | Stored permitted operational allocation on A ends including cleanup at 20:00 | Create otherwise valid two-person booking at 20:00 | Allow adjacency [old start,20:00) and [20:00,21:45); no overlap | database integration | 4 |
+| AC-022 | CAP-06; LIFE-01 | A is last eligible table for two distinct two-person requests at 18:00 | Submit simultaneously with different keys | Exactly one confirms; loser receives conflict, no duplicate active interval, no success outbox for loser | database integration | 4 |
+| AC-023 | LIFE-01 | Booking creation committed but response was lost | Retry identical payload/key, then use same key with changed party size | Identical retry returns original result without new history/outbox/allocation; mismatched payload rejected | API integration | 4 |
+| AC-024 | CAP-04 | Four guests; C and AB both available with capacity four | Allocate, then repeat for tie options with identical capacity/table count | Prefer C (one table); exact ties use stable identifier order, independent of query row order | unit | 4 |
+| AC-025 | CAP-01; SET-02 | A inactive; B has a future allocation | Create on A and attempt to deactivate/block B | A excluded; B change needs preview/resolution and cannot silently remove its allocation | API integration | 6 |
+| AC-026 | SEC-03; CAP-06 | Owner requests A at 18:00 when A already allocated over that interval | Invoke manual booking with a purported force flag | Reject conflict/unsupported flag; role cannot bypass non-overlap | API integration | 5 |
+| AC-027 | SET-02 | Manager reviewed conflict-free settings version v1; a new conflicting booking commits | Activate using the old preview/version | Reject stale activation and show updated conflicts; preserve active settings and booking | database integration | 6 |
+
+## Lifecycle, edits and occupancy scenarios
+
+| ID | Requirement reference | Given | When | Then | Verification layer | Target phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-028 | LIFE-03; TR-06 | Pending E request for 19:30 created 16:00, deadline 18:00; worker delayed; now 18:05 | Read availability then submit a new eligible 19:30 request | Read omits expired hold without writing; command atomically expires old hold before new allocation, old outcome expired once | database integration | 4 |
+| AC-029 | LIFE-01/03; TR-03/06 | Same pending request, clock exactly 18:00 | Manager approval and expiry race | Approval fails even if worker has not run; exactly one expiry history/outbox effect and no confirmation | database integration | 4 |
+| AC-030 | LIFE-03; TR-03 | Same request; Manager acquires lock and approves at 17:59:59 | Expiry job runs at 18:00 | Confirmed state remains confirmed; expiry cannot release its allocation | database integration | 4 |
+| AC-031 | LIFE-07; SET-03 | Confirmed two-person A booking at 18:00; proposed 18:30 allocation conflicts; clock 16:00 | Customer reschedules | Reject atomically; old time, state, policy snapshot, deadline, token version and allocation remain intact | database integration | 4 |
+| AC-032 | LIFE-07; POL-06; SELF-03 | Confirmed two-person 19:30 on A, E free, clock 16:00 | Change to eight guests, first without acknowledgement then with it | First rejected unchanged; acknowledged edit atomically releases A, holds E until 22:15, becomes pending with 18:00 approval deadline and rotated credentials | API integration | 8 |
+| AC-033 | LIFE-03/07 | Pending eight-person 19:30 request created 15:00, deadline 17:00; clock 16:00, A free | Change to two guests at 20:00 | Stays pending; deadline remains 17:00, not 18:00; new occupancy ends 21:45 and old allocation releases atomically | database integration | 4 |
+| AC-034 | TR-08; LIFE-01 | Confirmed two-person A booking at 18:00; customer authorised at 16:00 | Cancel and retry same command | One cancelled transition/notification intent; future allocation released exactly once, history retained | database integration | 4 |
+| AC-035 | POL-10; SELF-01 | Live confirmed 18:00 booking, valid scoped session; clock 16:00:00 then 16:00:01 in isolated fixtures | Attempt cancellation and request-text edit | Exactly two hours allows; one second later denies with staff-contact guidance, no mutation | API integration | 8 |
+| AC-036 | POL-09; TR-09 | Confirmed 18:00 booking, absent guest | Staff marks no_show at 18:14:59 then 18:15:00 | First rejected; equality permitted with reason/attestation; release unused occupancy, no automatic time-only transition | API integration | 5 |
+| AC-037 | TR-07/09; LIFE-04 | Guest marked arrived at 18:05 | Staff attempts no_show at 18:20 | Invalid transition; retain arrived/allocation; no no-show event | API integration | 5 |
+| AC-038 | LIFE-05; PERM-13 | Confirmed 18:00 A booking, guest checks in at 17:40; another allocation ends 18:00 | Staff records arrival and proposes seating at 17:45 | Arrival allowed without extra allocation; early seating denied until Manager adjustment passes, which conflicts here | API integration | 5 |
+| AC-039 | LIFE-05 | Confirmed two-person 18:00 A booking; guest arrives/seats 18:10 | Record arrival then seating within original interval | One allocation still ends 19:45; no automatic late-arrival extension | database integration | 5 |
+| AC-040 | LIFE-06; TR-12 | Four-person C booking seated at 18:00, planned dining end 20:00, no other conflicts | Complete at 19:40 | completed with cleanup [19:40,19:55); historical allocation retained; 19:50 conflicts with cleanup, otherwise eligible 20:00 may be offered | database integration | 5 |
+| AC-041 | LIFE-05/06; UX-06 | Same booking; next C booking starts 20:30 | Report actual completion at 20:20, requiring cleanup to 20:35 | Conflict, no partial release or completed transition; preserve next booking, record observation/incident, suppress affected new availability and require Manager resolution | database integration | 5 |
+| AC-042 | LIFE-01/02 | A cancelled booking with old reference exists | Try to reopen confirmed, then create linked replacement on now-occupied A | Reopen rejected; replacement independently conflicts, old terminal record unchanged | API integration | 4 |
+| AC-043 | TR-04/06; LIFE-08 | One live request declined by Manager with reason and another request expires | Aggregate reservation outcomes | Distinct declined/expired outcomes; neither becomes cancelled or inflates cancellation count; later metric denominator explicitly defined | API integration | 13 |
+| AC-044 | OPS-01; PERM-09/11 | Confirmed 18:00 booking; customer cutoff passed, clock 17:30 | Customer edits; Staff edits; Manager proposes 18:30 with reason and guest agreement | Customer denied; Staff future edit denied; Manager may apply documented cutoff/notice waiver only if all capacity/service/state rules pass | API integration | 5 |
+| AC-045 | LIFE-01; UX-06 | Manager reads pending version v1, another Manager approves to v2 | First Manager submits decline against v1 | Stale conflict; preserve confirmed v2; require refresh/review rather than silent decline | API integration | 5 |
+| AC-046 | SET-03; LIFE-07 | Existing two-person 18:00 A booking snapshots dining 90/buffer 15; new dining default 120 | Read original, then reschedule to free A at 18:30 | Original remains ending 19:45 until edit; successful edit uses current 120+15 and ends 20:45; failed edit would retain original | database integration | 4 |
+
+## Security, communication and waiting-list scenarios
+
+| ID | Requirement reference | Given | When | Then | Verification layer | Target phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-047 | SELF-02/03 | Invalid, revoked or expired management token (each isolated) | Exchange or access at exactly expires_at | Same generic denial, no data or mutation, expired equality grants no access | API integration | 8 |
+| AC-048 | SEC-01; SELF-02/05 | Session authorised for reservation R1 | Read/edit R2 by substituting URL/body ID | Deny without disclosing R2 existence/contact data; database scope also rejects access | API integration | 8 |
+| AC-049 | PERM-20/22; SEC-01 | Enabled Staff identity | Invoke customer export or role-administration command directly | Deny at server/database boundary even if request bypasses UI | API integration | 3 |
+| AC-050 | SEC-02 | Staff session created before Owner disables user | Use stale session for list and cancellation requests | Both denied using current identity state; no privileged read or mutation survives disablement | API integration | 3 |
+| AC-051 | SELF-04/05 | Valid link in email; scanner issues GET and browser previews it | Load link without explicit POST action | No reservation change, cancellation, token exchange/session or hold consumption | API integration | 8 |
+| AC-052 | SELF-03/05 | Active management token and session; successful time/party edit | Reuse old token/session, then use newly issued credential | Old credentials denied; new scope/expiry reflects new agreement; current customer session renewed safely after commit | API integration | 8 |
+| AC-053 | SELF-07 | Existing/nonexistent destinations, repeated resend attempts | Exceed destination/hour and IP/hour thresholds | Same generic acknowledgement; no unbounded deliveries, no existence signal and no delivery to a substituted address | API integration | 8 |
+| AC-054 | SELF-06 | Valid customer session | Include new email/phone in ordinary reservation edit payload | Reject ownership transfer without verified workflow; original contacts and credentials unchanged | API integration | 8 |
+| AC-055 | SELF-04; SEC-06 | Management-token exchange and Owner integration-secret update | Inspect responses, referrers, telemetry and application/infrastructure logs | No raw tokens, cookies or secrets; no secret read-back; no analytics requests from management landing page | end-to-end | 8 and 10 |
+| AC-056 | SEP-02; LIFE-01 | Booking transaction committed confirmed with outbox event | Email/WhatsApp provider fails and worker retries | Booking/allocation remain confirmed; delivery record reports failure/retry; no second booking or duplicate outbox intent | API integration | 10 |
+| AC-057 | SEC-07; PERM-01 | Menu item and assistant knowledge document are unpublished | Anonymous client and public assistant retrieval query them | Neither exposes drafts/private content; only published projections are eligible | API integration | 6 and 12 |
+| AC-058 | SEP-01; PERM-27 | No table availability, customer gives validated waitlist details | Enroll in waiting list | Create enrollment only; no reservation/hold/occupancy change and no promised booking | database integration | 11 |
+| AC-059 | SEP-01; CAP-06 | Synthetic Phase 11 offer on AB for four guests at 18:00; issued 16:50, explicit expiry 17:00 (fixture, not a default offer lifetime) | Accept at 16:59 | Atomically convert both table holds into one confirmed reservation, no gap for a competing booking and no double allocation | database integration | 11 |
+| AC-060 | SEP-01; SEC-04 | Same independent synthetic offer expires at 17:00 | Acceptance and scoped expiry job race at 17:00 exactly | Acceptance denied; release hold once; enrollment remains separate, no reservation confirmation | database integration | 11 |
+| AC-061 | SEC-04; PERM-25/26 | Outbox-only service credential | Attempt approval, no-show, export and direct capacity edits | All denied; only its assigned delivery records/commands are accessible | API integration | 3 |
+| AC-062 | SELF-08; SEP-02 | Guest declines marketing, supplies required booking contacts | Submit eligible booking | Booking succeeds without marketing consent; operational delivery intent remains separate from marketing preference | API integration | 8 |
+| AC-063 | SELF-05 | Scoped session issued at 16:00, underlying link valid much longer | Read at 16:30 without a fresh explicit exchange | Session expired; no implicit indefinite refresh or mutation; valid link can start a new session through explicit exchange | API integration | 8 |
+
+## Journey and responsive scenarios
+
+| ID | Requirement reference | Given | When | Then | Verification layer | Target phase |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-064 | UX-01/03/04 | Customer selects an eligible eight-person request | Traverse review and submit | Review explains duration/approval; result only after commit says awaiting approval, shows local deadline, never generic booking confirmation | end-to-end | 8 |
+| AC-065 | UX-02/05/10 | Customer entered full details; last eligible table taken before submit | Submit, then compare empty-availability and service-error responses | Preserve inputs, show actionable conflict/valid alternatives; distinguish no availability from retryable service failure | end-to-end | 8 |
+| AC-066 | UX-03; LIFE-01 | Customer double-clicks and first response times out after commit | Recover/retry booking result | One reservation, clear in-progress/recovery state, no premature success and no new idempotency key until outcome is resolved | end-to-end | 8 |
+| AC-067 | UX-05/08/09 | Customer flow at 360/768/1440px and 200% zoom | Complete booking, input correction, self-service edit and cancellation using keyboard; repeat mobile touch review | No customer horizontal overflow; mobile form single-column; practical 44px targets, visible focus, accessible summary/status announcements, essential actions retained | end-to-end | 8 |
+| AC-068 | UX-06/07/09 | Authorised staff/Manager on narrow screen with stale booking data | Review list, record arrival, resolve a conflict, cancel with reason and confirmation using keyboard | Context-preserving contained table scroll or alternative view, no hidden essential action, clear stale conflict, focus restored after dialog | end-to-end | 5 |
+| AC-069 | UX-05/09 | Reduced-motion preference enabled and status colours not distinguishable | Navigate critical booking and operational workflows | No essential information conveyed only through motion/colour; all status labels remain understandable and focus visible | end-to-end | 5 and 8 |
+| AC-070 | UX-10; POL-10; SELF-01 | Customer is inside cutoff and demo has no verified contact details | Open management page | Read permitted data; mutation disabled/denied with truthful staff-assistance explanation and no fabricated contact action | end-to-end | 8 |
+
+## Review gate
+
+Before implementing a target scenario, select its fixture, clock and actor explicitly and link it to the requirement IDs above. Use real PostgreSQL transactions for allocation races; unit mocks cannot prove non-overlap. API checks must exercise direct unauthorised access, not merely hidden controls. All listed product scenarios remain unexecuted until their target phase; recording a documentation review never changes that status.
