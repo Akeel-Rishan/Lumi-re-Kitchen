@@ -7,11 +7,15 @@ export const metadata: Metadata = {
   description: `${restaurant.name}. ${restaurant.demoNotice}`,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang={restaurant.locale}>
       <body>
-        <a className="skip-link" href="#main-content">Skip to content</a>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
         <div className="site-shell">
           <header className="site-header">
             <span className="wordmark">{restaurant.name}</span>

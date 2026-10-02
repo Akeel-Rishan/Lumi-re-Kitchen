@@ -4,15 +4,23 @@
 - Strict TypeScript, no unjustified `any`, suppression comments, disabled lint rules or skipped build type checking. Prefer small, named components and explicit module contracts.
 - Server Components by default. Client Components only for interaction. No unnecessary global state, empty modules, unused abstractions, speculative provider packages or placeholder production APIs.
 - Presentation reads configuration; domain rules live in modules and are enforced at the database boundary where required. Validate input, authorise commands and keep secrets server-side.
-- Use consistent double quotes, semicolons and two-space indentation. Run lint, type checking and production build before handoff. ESLint is a separate command, not an assumed part of the build.
+- Use Prettier's configured double quotes, semicolons, two-space indentation and LF endings. `format` explicitly writes; `format:check` is read-only. Verify frozen installation, `check`, `build`, then `test:e2e` before handoff. ESLint remains separate from the build and strict TypeScript includes fresh Next route type generation.
 - Each feature must consider loading, empty, error, success, permission-denied and conflict states wherever applicable. Prevent duplicate submissions; show actionable, truthful errors without stack traces or secrets. Never display booking success before the transaction succeeds.
 - Semantic landmarks, logical headings, meaningful labels, visible focus, keyboard operation and at least 44px touch targets. Check 360px, 768px and 1440px, text zoom, contrast and reduced motion when motion exists. Avoid unnecessary ARIA, navigation or external assets.
-- Use actual constraints and concurrent database integration tests for booking correctness. Test idempotency, edit rollback, expiry races, permissions, daylight-saving changes and overnight services. Avoid snapshots that merely mirror markup. Full test infrastructure belongs to 1.3.
+- Use actual constraints and concurrent database integration tests for booking correctness. Test idempotency, edit rollback, expiry races, permissions, daylight-saving changes and overnight services. Avoid snapshots that merely mirror markup. Step 1.3 configures Vitest and production Chromium/axe tests; database/API suites arrive with their actual capabilities. Follow the [testing strategy](quality/testing-strategy.md).
 - Add dependencies only when used. Pin the runtime and package manager; use frozen-lockfile installation for reproducibility. Do not create additional lockfiles.
 - Never commit credentials, log personal data unnecessarily, or expose privileged environment variables with NEXT_PUBLIC. Introduce redacted schema validation alongside each integration, without making unrelated builds require credentials.
 - Observability must distinguish user conflicts from faults and correlate commands, database work and delivery attempts. External integrations require retry and deduplication design.
 - Future migrations need repeatable application, policy tests and rollback/recovery planning. Production readiness must cover backups, restore rehearsal, monitoring, accessibility and deployment procedures.
 - Do not deploy, provision paid resources, send messages, push commits or alter external services as part of Step 1.1.
+
+## Quality gate maintenance
+
+- The foundation has no meaningful unit subject yet: do not test configuration constants or fabricate business logic. Remove Vitest's temporary `passWithNoTests` allowance with the first real unit behaviour. Coverage is not applicable until meaningful tests exist; do not claim 100% for an empty suite.
+- Playwright must discover real tests, run against a production build, reject focused tests in CI and use zero retries initially. No fixed sleeps, blanket console suppression, broad snapshots or unnecessary page-object framework.
+- Use deterministic synthetic data, controlled clocks and isolated contexts; ordinary CI must not contact real providers. Missing future integration infrastructure must fail clearly, never silently skip.
+- Keep supported axe A/AA checks enabled; document any precisely scoped future exception. Automation complements manual keyboard, reading-order, zoom and assistive-technology review.
+- CI action revisions must be verified/pinned; minimum read permissions and narrowly scoped failure artifacts only. No secret-dependent tests, deployment or remote repository-setting changes. See [CI operations](quality/ci.md).
 
 ## Foundation manual checks
 

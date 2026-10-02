@@ -17,14 +17,19 @@ Open http://localhost:3000. Stop the server with Ctrl+C.
 
 If pinned pnpm is already available, the equivalent commands are:
 
-| Purpose | Command |
-| --- | --- |
-| Install locked dependencies | `pnpm install --frozen-lockfile` |
-| Local development | `pnpm dev` |
-| Lint | `pnpm lint` |
-| Type checking (including route type generation) | `pnpm typecheck` |
-| Production build | `pnpm build` |
-| Production start after build | `pnpm start` |
+| Purpose                                         | Command                                   |
+| ----------------------------------------------- | ----------------------------------------- |
+| Install locked dependencies                     | `pnpm install --frozen-lockfile`          |
+| Local development                               | `pnpm dev`                                |
+| Apply / check formatting                        | `pnpm format` / `pnpm format:check`       |
+| Combined static and fast checks                 | `pnpm check`                              |
+| Lint                                            | `pnpm lint`                               |
+| Type checking (including route type generation) | `pnpm typecheck`                          |
+| Fast tests / watch                              | `pnpm test:unit` / `pnpm test:unit:watch` |
+| Unit coverage (not applicable yet)              | `pnpm test:coverage`                      |
+| Production build                                | `pnpm build`                              |
+| Production start after build                    | `pnpm start`                              |
+| Production browser tests / UI                   | `pnpm test:e2e` / `pnpm test:e2e:ui`      |
 
 For any command in the table on Windows, replace `pnpm` with `npm.cmd exec --yes --package=pnpm@10.34.6 -- pnpm` if needed. On other systems use `npm exec` instead of `npm.cmd`. The initial installation needs registry access; the app itself makes no external-service calls.
 
@@ -53,6 +58,10 @@ The directory was empty during Step 1.1. At Step 1.2 inspection it has an existi
 
 Integration-specific schema validation will be added alongside each provider, at the server boundary, with redacted errors. Public values and privileged secrets must remain separate. No provider may be initialised unconfigured at import/build time.
 
-Run lint, typecheck and build, then start the production server. Check `/` returns the demo page and `/missing-page` returns the custom 404; follow Back to home. Manually inspect 360px, 768px and 1440px widths for overflow, use 200% zoom, and Tab/Enter through the skip and recovery links. Detailed checks and error-boundary limitations are in engineering standards and progress.
+Step 1.3 adds Prettier, a Node Vitest runner and Chromium/axe tests against the production application. There are **no unit tests yet** and unit coverage is **not applicable**; the temporary empty-suite allowance must be removed with the first meaningful unit subject. Browser tests are real checks of the existing foundation, not the future operating contracts.
 
-Next work requires the specific **1.3** prompt for quality checks, CI and test infrastructure. Step 1.2's acceptance scenarios are specifications, not passing tests or implemented product features.
+Standard sequence: `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm build`, then `pnpm test:e2e`. First install the required browser with `pnpm exec playwright install --only-shell chromium` (Linux CI uses `--with-deps`). Playwright starts `next start` on 127.0.0.1:3100; no separate manual server or duplicate build is needed. Existing-server reuse is disabled unless explicitly opted in locally. See [CI operations](docs/quality/ci.md) for exact Windows commands, reports, troubleshooting and workflow security, and [testing strategy](docs/quality/testing-strategy.md) for coverage boundaries.
+
+Manual focus appearance, reading order, 200% zoom and assistive-technology review remain necessary. Automated axe/viewport checks do not prove full accessibility or visual quality. Runtime error-boundary injection is deferred; no crash route is added. Hosted CI results must be observed before claiming a pass; this repository has no passing-run badge.
+
+Next work requires the specific **2.1 — Restaurant identity, public/admin design tokens, typography, and responsive rules** prompt. Step 1.2's acceptance scenarios remain specifications, not executed business tests. Phase 2 has not started.
