@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 1.1–1.3 are authorised; 1.2 defines contracts and 1.3 adds quality infrastructure only. Later steps must not be implemented without their specific step prompt. Each step should end with recorded evidence against its acceptance criteria.
+Steps 1.1–1.3 and 2.1 are authorised. Later steps must not be implemented without their specific step prompt. Each step should end with recorded evidence against its acceptance criteria.
 
 ## 1. Product and engineering foundation
 
@@ -10,8 +10,9 @@ Steps 1.1–1.3 are authorised; 1.2 defines contracts and 1.3 adds quality infra
 
 ## 2. Premium design system
 
-- 2.1 — Pending: Restaurant identity, public/admin design tokens, typography, and responsive rules; review contrast.
+- **2.1 — Complete:** Restaurant identity, public/admin design tokens, typography, and responsive rules. Contrast measured, production build and 27 browser checks passed; landing/404 screenshots inspected at all three widths and doubled text. See [handoff](progress.md) for manual limits.
 - 2.2 — Pending: Build necessary accessible controls and state patterns; verify keyboard and mobile behaviour.
+- 2.3 — Pending: Public navigation and application shells.
 
 ## 3. Database and security foundations
 

@@ -15,7 +15,7 @@ export default function Error({
       <p className="introduction">
         Please try again, or return to the welcome page.
       </p>
-      <div className="flex flex-wrap gap-4">
+      <div className="recovery-actions">
         <button className="action" onClick={() => retry()}>
           Try again
         </button>

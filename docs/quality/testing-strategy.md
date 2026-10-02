@@ -28,7 +28,7 @@ With no unit tests, coverage is **not applicable yet**. `test:coverage` selects 
 
 ## Foundation browser coverage
 
-[playwright.config.ts](../../playwright.config.ts) defines three Chromium projects: 360×800, 768×1024 and 1440×1000. Each runs five tests: three foundation cases and two accessibility scans, **15 browser executions** in total. These are desktop Chromium viewport simulations, not proof on real mobile hardware. Browser locale is en-GB and timezone Europe/London. Future date-sensitive tests must also use a different browser timezone, such as America/New_York, to prove restaurant-local behaviour rather than accidental browser-zone dependence.
+[playwright.config.ts](../../playwright.config.ts) defines three Chromium projects: 360×800, 768×1024 and 1440×1000. Each runs nine tests: three foundation cases, two accessibility scans and four design-foundation cases, **27 browser executions** in total. These are desktop Chromium viewport simulations, not proof on real mobile hardware. Browser locale is en-GB and timezone Europe/London. Future date-sensitive tests must also use a different browser timezone, such as America/New_York, to prove restaurant-local behaviour rather than accidental browser-zone dependence.
 
 | ID         | Current executable check                                                                                                                | Scope limit                                                                                                      |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -40,6 +40,10 @@ With no unit tests, coverage is **not applicable yet**. `test:coverage` selects 
 Tests use semantic locators and web-first assertions, no fixed sleeps or broad page snapshots. A small shared helper checks real repeated content-fit conditions and browser health; no page-object framework. Browser errors and external network requests fail the test. The only console exception is Chromium's exact native 404 resource message at the single deliberate missing-page document URL; application errors, asset errors and all other URLs remain failures. This is not an axe rule exception. The tests require no provider credentials and block unexpected external requests before continuing them.
 
 The existing error boundary has no safe dedicated fault-injection seam. Its visible recovery/callback test is deferred until a meaningful component seam exists. Do not add a public crash route or production switch, and do not claim the 404 test covers runtime error recovery. Firefox/WebKit are a later deliberate expansion, not part of this gate.
+
+## Step 2.1 design checks
+
+DESIGN-01 verifies nested admin backgrounds, heading families/sizes, numeral styles and public reset, restoring attributes in finally. DESIGN-02 runs for landing and 404, attaches normal and doubled-root-text screenshots and checks content fit/reflow. DESIGN-03 checks actual keyboard focus styling, reduced motion and light-theme stability under OS dark preference. Screenshots are review evidence, not baseline assertions. Native browser zoom and assistive technology remain manual. No admin route or production test hook is added.
 
 ## Test data, isolation and future traceability
 
@@ -53,4 +57,4 @@ The existing error boundary has no safe dedicated fault-injection seam. Its visi
 
 ## Manual review still required
 
-Automated scans do not prove full accessibility conformance or visual quality. Review focus visibility, reading order, 200% zoom/reflow, understandable error copy, contrast in actual rendering, touch use and real assistive technology. Inspect axe incomplete results in attachments. Review the restrained landing page at all three widths; no redesign is part of this step. See [CI operations](ci.md) for commands and report inspection.
+Automated scans do not prove full accessibility conformance or visual quality. Review focus visibility, reading order, 200% zoom/reflow, understandable error copy, contrast in actual rendering, touch use and real assistive technology. Inspect axe incomplete results in attachments. Review the restrained landing and not-found screens at all three widths; Step 2.1 applies the documented design foundation. See [CI operations](ci.md) for commands and report inspection.

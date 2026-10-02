@@ -59,11 +59,19 @@ export async function expectNoHorizontalOverflow(page: Page) {
 export async function expectContentFits(page: Page, locator: Locator) {
   await expect(locator).toBeVisible();
   await locator.scrollIntoViewIfNeeded();
-  await expect(locator).toBeInViewport({ ratio: 1 });
+  await expect(locator).toBeInViewport();
   const box = await locator.boundingBox();
   expect(box).not.toBeNull();
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  // Chromium rounds scroll positions; allow at most one CSS pixel vertically.
+  // Text taller than the viewport must remain scrollable, not fit a fixed height.
+  if (box!.height <= page.viewportSize()!.height) {
+    expect(box!.y).toBeGreaterThanOrEqual(-1);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(
+      page.viewportSize()!.height + 1,
+    );
+  }
   const clipped = await locator.evaluate((element) => {
     let current: Element | null = element;
     while (current) {

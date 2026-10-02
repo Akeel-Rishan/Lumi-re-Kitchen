@@ -1,6 +1,47 @@
 # Development handoff
 
-Current step: **1.3 — Complete**. Local verification and handoff completed on 2026-10-02. Hosted CI is configured but has not been run or observed. Earlier evidence is preserved below as historical context.
+Current step: **2.1 — Complete**. Local implementation and verification completed on 2026-10-02. Hosted CI remains unobserved. Earlier handoffs below are historical.
+
+## Step 2.1 handoff
+
+Implemented restaurant identity, semantic public/admin design tokens, typography and responsive rules only. Initial Git working tree was clean; no applicable ancestor/repository AGENTS.md or bundled font assets were found. Inspected existing source, Tailwind 4.3.3/PostCSS/TypeScript/framework configuration, lockfile, operating contracts, standards, roadmap, progress and browser suites. No user changes were overwritten.
+
+### Files and decisions
+
+- Created [src/styles/tokens.css](../src/styles/tokens.css): centralized primitives, semantic colours/status roles, font/type/spacing/geometry/motion/elevation/stacking scales and explicit public/admin scopes. Tailwind 4 inline aliases consume these roles.
+- Updated globals.css, layout.tsx, page.tsx and error.tsx. Root defaults to public; the landing uses bounded editorial display type. Shared styles apply the same foundation to the existing not-found view without changing its markup or recovery link. Error retry/back-home actions retain their behaviour; their wrapper uses a named local style.
+- Added [brand direction](design/brand-direction.md), [token/contrast/status reference](design/design-tokens.md), [typography/layout](design/typography-and-layout.md), [ADR 0004](decisions/0004-design-foundation.md) and tests/e2e/design-foundation.spec.ts. Updated README, engineering standards, testing strategy, roadmap and this handoff. The existing content-fit helper now tolerates at most one CSS pixel of vertical scroll rounding while preserving horizontal and clipping assertions.
+- Public: ivory #F7F4ED, ink #202824, evergreen #184C3A, decorative bronze #927040. Admin: neutral #F3F5F4/white surfaces, compact sans-serif headings, tabular numerals. Both share semantic interaction and status names.
+- Intentional Georgia/Times serif and Segoe UI/Arial/Helvetica sans-serif system stacks; no suitable licensed local assets existed. No downloaded fonts, licensing files, new dependencies, package/lockfile changes or build-time font network requirement.
+- Contrast measured with documented sRGB luminance formula: primary/ivory 13.75:1, secondary/ivory 7.26:1, muted/ivory 5.42:1, white/evergreen 9.84:1. All four coloured status text/background pairs are at least 6.79:1. Strong boundaries are at least 3.15:1 across approved light surfaces. Bronze/ivory is 4.14:1, restricted to decoration. Complete approved matrix and exact nine lifecycle label mappings are documented.
+
+### Commands and observed outcomes
+
+Commands ran at the repository root.
+
+| Command                                                                                 | Actual outcome                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git -c safe.directory='C:/Users/PC/Desktop/Lumière Kitchen' status --short`            | Clean before implementation; only this step's changes at handoff. Command-local ownership exception.                                                                                                                                                                                                                                                                   |
+| `npm.cmd run format`                                                                    | Passed; formatted the new/updated CSS, tests and documentation.                                                                                                                                                                                                                                                                                                        |
+| `npm.cmd run check`                                                                     | Formatting, zero-warning lint, generated route types, strict TypeScript and fast runner passed. Unit count **0**, explicitly reported under the existing exception.                                                                                                                                                                                                    |
+| `$env:NEXT_TELEMETRY_DISABLED='1'; npm.cmd run build`                                   | Final production build passed, static root/not-found routes. First attempt exposed a PowerShell-added UTF-8 BOM in globals.css; removed it and rebuilt. An attempted browser start immediately after that failed build correctly rejected the missing production build.                                                                                                |
+| `$env:CI='true'; npm.cmd run test:e2e`                                                  | Final run **27 passed in 48.6s**, no retries/skips. Nine foundation executions, six axe scans, three nested-theme checks, six doubled-text reflow checks and three focus/reduced-motion/dark-preference checks. Normal Windows process permissions used for reliable browser/server lifecycle.                                                                         |
+| Same browser command, initial design run                                                | 23 passed, 4 failed: three revealed theme-root specificity overriding a nested heading; fixed with :where on base theme styling. One was 0.9995265 intersection ratio from fractional scroll rounding, corrected with a bounded 1px vertical tolerance. No check was disabled.                                                                                         |
+| `npm.cmd exec --yes --package=pnpm@10.34.6 -- pnpm install --frozen-lockfile --offline` | npm launcher registry access failed EACCES in sandbox; adding npm --offline failed ENOTCACHED. No dependency changes.                                                                                                                                                                                                                                                  |
+| `pnpm.cmd --version`                                                                    | Existing global launcher reports **10.34.6**. README now explains both the installed launcher and fallback.                                                                                                                                                                                                                                                            |
+| `pnpm.cmd install --frozen-lockfile --offline`                                          | Restricted environment selected a different store and aborted with ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY. Repeated with normal permissions and the existing user store: **passed**, lockfile current, already up to date. No node_modules purge or store migration. Existing ignored unrs-resolver build-script warning remains; checks pass without enabling it. |
+
+### Visual evidence and limits
+
+Opened actual production screenshots of landing and not-found at **360, 768 and 1440px**. Inspected both routes again with doubled root text at every width. Clear heading hierarchy, natural wrapping, legible disclosure/booking notice and recovery action; no clipped content or unintended horizontal scrolling. Mobile header wraps; desktop container stays bounded. Enlarged mobile text makes a long, normally scrolling page. Inspected visible recovery focus screenshots, with evergreen outer ring and white separation.
+
+Screenshots are attached to DESIGN-02/03 in playwright-report/index.html, not committed baseline images. Browser guards reported no unexpected external requests or application errors; system font stacks resolved without remote assets. Admin was applied temporarily to existing content and restored in finally; no admin route or test hook exists.
+
+Automated 200% root-text enlargement is **not native browser zoom**. Native browser zoom, real assistive technology and cross-platform font appearance still need manual review. Axe reported no supported violations, not full accessibility conformance. Error-boundary styles/callback were source reviewed; runtime fault injection remains deferred from Step 1.3. No public crash route. Unit coverage remains N/A; no invented unit tests or business behaviour. All AC-001–AC-070 remain unexecuted future specifications.
+
+No remaining local implementation blocker. Hosted CI has not been run or observed. No commit, push, deployment, external-service change, navigation/shell, shared component library or later feature was added.
+
+Next step: **2.2 — Accessible shared components**, only with its specific prompt.
 
 ## Step 1.3 handoff
 

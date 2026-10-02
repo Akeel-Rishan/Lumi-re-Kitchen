@@ -6,7 +6,7 @@ An Arizonix demonstration project for a fictional restaurant in Manchester, UK. 
 
 Use Node **22.20.0** (see `.nvmrc`) and pnpm **10.34.6**. No credentials or `.env.local` file are required. `.env.example` intentionally contains comments only.
 
-On this Windows environment pnpm is not globally installed and PowerShell blocks npm.ps1. The `.cmd` launcher works without changing execution policy or installing pnpm globally:
+Use `pnpm.cmd` in PowerShell if its script wrapper is blocked. If pnpm is not installed globally, npm can launch the pinned version without changing execution policy:
 
 ```powershell
 npm.cmd exec --yes --package=pnpm@10.34.6 -- pnpm install --frozen-lockfile
@@ -64,4 +64,6 @@ Standard sequence: `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm build`,
 
 Manual focus appearance, reading order, 200% zoom and assistive-technology review remain necessary. Automated axe/viewport checks do not prove full accessibility or visual quality. Runtime error-boundary injection is deferred; no crash route is added. Hosted CI results must be observed before claiming a pass; this repository has no passing-run badge.
 
-Next work requires the specific **2.1 — Restaurant identity, public/admin design tokens, typography, and responsive rules** prompt. Step 1.2's acceptance scenarios remain specifications, not executed business tests. Phase 2 has not started.
+Step 2.1 defines the [brand direction](docs/design/brand-direction.md), [semantic tokens and contrast](docs/design/design-tokens.md), and [typography/layout rules](docs/design/typography-and-layout.md). The existing welcome and recovery screens use these foundations; there is no final homepage, admin shell or shared component library. System fonts require no download. See [ADR 0004](docs/decisions/0004-design-foundation.md).
+
+Next work requires the specific **2.2 — Accessible shared components** prompt. Step 1.2's acceptance scenarios remain specifications, not executed business tests.

@@ -16,6 +16,8 @@
 
 ## Quality gate maintenance
 
+- Design source of truth: [semantic tokens](design/design-tokens.md) and [typography/layout](design/typography-and-layout.md). Consume CSS variables or their Tailwind 4 inline aliases; do not scatter brand hex values. Public/admin scopes share roles; future portals must preserve the intended theme. Bronze is decorative, subtle borders are not essential control boundaries, and statuses always have labels. System font stacks keep builds offline. Components and shells remain separately authorised steps.
+
 - The foundation has no meaningful unit subject yet: do not test configuration constants or fabricate business logic. Remove Vitest's temporary `passWithNoTests` allowance with the first real unit behaviour. Coverage is not applicable until meaningful tests exist; do not claim 100% for an empty suite.
 - Playwright must discover real tests, run against a production build, reject focused tests in CI and use zero retries initially. No fixed sleeps, blanket console suppression, broad snapshots or unnecessary page-object framework.
 - Use deterministic synthetic data, controlled clocks and isolated contexts; ordinary CI must not contact real providers. Missing future integration infrastructure must fail clearly, never silently skip.
